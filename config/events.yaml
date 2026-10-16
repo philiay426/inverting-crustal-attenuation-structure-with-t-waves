@@ -1,0 +1,220 @@
+# 事件参数配置 — 加新事件只需追加 copy 一段
+# 2014波多黎各
+puerto_rico:
+  label: "puerto_rico_2014"
+  date: "2014-01-13"
+  lat: 19.0428
+  lon: -66.8096
+  depth_km: 20.0
+  mw: 6.3
+  data_dir: "/mnt/e/sharedate/2014-01-13-mw63-raw"
+  sac_date: "2014.013.035104"
+  case_dir: "2014-01-13-mw63-process"
+  azimuth_profiles: [327, 350]
+  snr_threshold: 3.0  # dB
+  t_p_azimuth_range: [325, 329]
+  t_s_azimuth_range: [348, 352]
+
+# 2014中大西洋洋中脊
+mid_atlantic_2014:
+  label: "mid_atlantic_2014"
+  date: "2014-07-27"
+  lat: 23.86
+  lon: -45.59
+  depth_km: 13.7
+  mw: 6.1
+  data_dir: "/mnt/e/sharedate/2014-07-27-mw61-northern-mid-atlantic-ridge-1"
+  sac_date: "2014.208.011841"
+  case_dir: "2014-07-27-mw61"
+  azimuth_profiles: [310]
+  snr_threshold: 1.5
+  t_p_azimuth_range: [308, 311]
+  t_s_azimuth_range: [305, 315]
+
+# 2026棉兰老岛（菲律宾）
+mindanao_2026:
+  label: "mindanao_2026"
+  date: "2026-06-07"
+  lat: 5.5918
+  lon: 125.0469
+  depth_km: 55.2
+  mw: 7.8
+  data_dir: "/mnt/e/sharedate/case/2026-06-07-mww78-mindanao-philippines/raw"
+  sac_date: "2026.158.232741"
+  case_dir: "2026-06-07-mww78-mindanao-philippines"
+  azimuth_profiles: [180]
+  snr_threshold: 3.0  # dB
+
+# 2014-02-18 巴巴多斯东北（北西洋）
+barbados_2014:
+  label: "barbados_2014"
+  date: "2014-02-18"
+  lat: 14.6682
+  lon: -58.9272
+  depth_km: 15.0
+  mw: 6.5
+  data_dir: "/mnt/e/sharedate/case/2014-02-18-mw65-north-atlantic-ocean"
+  sac_date: "2014.049.091714"
+  case_dir: "2014-02-18-mw65-north-atlantic-ocean"
+  azimuth_profiles: [315]
+  snr_threshold: 1.5
+  t_p_azimuth_range: [305, 325]
+  t_s_azimuth_range: [290, 330]
+
+# 2025-04-16 东南印度洋海岭
+southeast_indian_ridge_2025:
+  label: "southeast_indian_ridge_2025"
+  date: "2025-04-16"
+  lat: -47.8064
+  lon: 99.7261
+  depth_km: 10.0
+  mw: 6.6
+  data_dir: "/mnt/e/sharedate/case/2025-04-16-mww66-southeast-indian-ridge/raw"
+  sac_date: "2025.106.013259"
+  case_dir: "Australian/2025-04-16-mww66-southwest-indian-ridge"
+  azimuth_profiles: [55, 85]
+  azimuth_half_width: 20
+  snr_threshold: 3.0
+
+# 2015-12-04 东南印度洋海岭
+southeast_indian_ridge_2015:
+  label: "southeast_indian_ridge_2015"
+  date: "2015-12-04"
+  lat: -47.6165
+  lon: 85.0913
+  depth_km: 35.0
+  mw: 7.1
+  data_dir: "/mnt/e/sharedate/case/2015-12-04-mww71-southeast-indian-ridge/raw"
+  sac_date: "2015.338.221453"
+  case_dir: "Australian/2015-12-04-mww71-southeast-indian-ridge-no"
+  azimuth_profiles: [55, 85]
+  azimuth_half_width: 20
+  snr_threshold: 3.0
+
+# 2015-12-04 东南印度洋海岭 (精简版)
+southeast_indian_ridge_2015b:
+  label: "southeast_indian_ridge_2015b"
+  date: "2015-12-04"
+  lat: -47.6165
+  lon: 85.0913
+  depth_km: 35.0
+  mw: 7.1
+  data_dir: "/mnt/e/sharedate/case/2015-12-04-mww71-southeast-indian-ridge-1/raw"
+  sac_date: "2015.338.221453"
+  case_dir: "Australian/2015-12-04-mww71-southeast-indian-ridge"
+  azimuth_profiles: [55, 85]
+  azimuth_half_width: 20
+  snr_threshold: 3.0
+
+sio2015:
+  date: "2015-12-04"
+  lat: -47.6165
+  lon: 85.0913
+  depth_km: 35.0
+  mw: 7.1
+  case_dir: "Australian/2015-12-04-mww71-southeast-indian-ridge"
+  snr_threshold: 3.0
+
+sio2022:
+  date: "2022-02-04"
+  lat: -48.0330
+  lon: 99.4949
+  depth_km: 10.0
+  mw: 6.3
+  case_dir: "Australian/2022-02-04-mww63-southwest-indian-ridge"
+  snr_threshold: 3.0
+
+solomon2022:
+  date: "2022-11-22"
+  lat: -9.8198
+  lon: 159.6033
+  depth_km: 14.0
+  mw: 7.0
+  case_dir: "Australian/2022-11-22-mww70-northeast-islands"
+  snr_threshold: 3.0
+
+# 2020-08-06 Prince Edward Islands Mw6.3 (非洲南部)
+prince_edward_2020:
+  label: "prince_edward_2020"
+  date: "2020-08-06"
+  lat: -41.6794
+  lon: 42.4486
+  depth_km: 10.0
+  mw: 6.3
+  data_dir: "/mnt/f/sharedate/case/Southern_Africa/2020-08-06-mww63-prince-edward-islands-region"
+  case_dir: "Southern_Africa/2020-08-06-mww63-prince-edward-islands-region"
+  snr_threshold: 3.0
+
+# 2019-01-22 Prince Edward Islands Region Mw6.7
+prince_edward_2019:
+  label: "prince_edward_2019"
+  date: "2019-01-22"
+  lat: -43.1219
+  lon: 42.3568
+  depth_km: 13.0
+  mw: 6.7
+  data_dir: "/mnt/f/sharedate/case/Southern_Africa/2019-01-22-mww67-prince-edward-islands"
+  case_dir: "Southern_Africa/2019-01-22-mww67-prince-edward-islands"
+  snr_threshold: 3.0
+
+# 2020-09-26 South of Africa Mw6.1 (非洲南部)
+south_africa_2020:
+  label: "south_africa_2020"
+  date: "2020-09-26"
+  lat: -48.0249
+  lon: 31.7404
+  depth_km: 10.0
+  mw: 6.1
+  data_dir: "/mnt/f/sharedate/case/Southern_Africa/2020-09-26-mww61-south-of-africa"
+  case_dir: "Southern_Africa/2020-09-26-mww61-south-of-africa"
+  snr_threshold: 3.0
+
+# 2018-04-19 Prince Edward Islands Mw6.0
+prince_edward_2018:
+  label: "prince_edward_2018"
+  date: "2018-04-19"
+  lat: -42.780
+  lon: 42.188
+  depth_km: 10.0
+  mw: 6.0
+  data_dir: "/mnt/f/sharedate/case/Southern_Africa/2018-04-19-mww60-prince-edward"
+  case_dir: "Southern_Africa/2018-04-19-mww60-prince-edward"
+  snr_threshold: 3.0
+
+# 2013-08-17 Southwest Indian Ridge Mw6.2
+sw_indian_ridge_2013:
+  label: "sw_indian_ridge_2013"
+  date: "2013-08-17"
+  lat: -34.887
+  lon: 54.128
+  depth_km: 10.9
+  mw: 6.2
+  data_dir: "/mnt/e/sharedate/case/Madagascar/2013-08-17-mw62-southwest-indian-ridge"
+  case_dir: "Madagascar/2013-08-17-mw62-southwest-indian-ridge"
+  snr_threshold: 6.0
+
+# 2013-07-22 Prince Edward Islands Region Mw6.3
+prince_edward_2013_07:
+  label: "prince_edward_2013_07"
+  date: "2013-07-22"
+  lat: -46.05
+  lon: 34.78
+  depth_km: 10.0
+  mw: 6.3
+  data_dir: "/mnt/f/sharedate/case/Southern_Africa/2013-07-22-mw63-prince-edward"
+  case_dir: "Southern_Africa/2013-07-22-mw63-prince-edward"
+  snr_threshold: 3.0
+
+# 2026 本州岛东部
+honshu_east_2026:
+  label: "honshu_east_2026"
+  date: "2026-08-01"
+  lat: 41.30
+  lon: 142.00
+  depth_km: 80.0
+  mw: 5.5
+  data_dir: "/mnt/e/sharedate/case/Japan/2026-08-01-mb55-honshu-east"
+  case_dir: "Japan/2026-08-01-mb55-honshu-east"
+  azimuth_profiles: []
+  snr_threshold: 1.0
+

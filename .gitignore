@@ -1,0 +1,33 @@
+# ===== Python 缓存与构建产物 =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# ===== 本地备份 / 临时文件 =====
+*.bak_pre_obspy
+*.bak_*
+*.backup
+*.swp
+*.swo
+*~
+
+# ===== 编辑器 / 系统 =====
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ===== 生成物：图件不入库（另行归档到事件目录/网盘）=====
+*.png
+*.jpg
+*.pdf
+
+# ===== 运行时状态 =====
+gmt.history
+
+# ===== 独立子仓库 / 本地虚拟环境（不进本仓库）=====
+t_phase_analysis/
