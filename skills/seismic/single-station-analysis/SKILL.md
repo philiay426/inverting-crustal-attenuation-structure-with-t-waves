@@ -67,7 +67,11 @@ python ~/.hermes/skills/seismic/single-station-analysis/scripts/run_single_stati
 它只作**事后诊断**（与 F-K 的 BAZ 比残差、看是否同号同量级），不用它反过来挑时窗或挑台。
 完全不以理论 BAZ 参与挑窗的独立流程见 `references/independent-baz-energy-window-workflow.md`。
 
-**SNR 口径（2026-10-14 起，取代 2026-09-02 的“未带通 + Welch 频段积分”）**：统一噪声基准 SNR = 20log10( 信号窗 RMS / **阵列噪声中位数** )；波形**先 2–8 Hz 整段带通、再切窗算 RMS**。`stations.csv` 主列 `snr_u` 即此口径（`snr/snr_z/snr_r` 是自噪对照列）。`sacprocess/envelope/*.npz` 的 `waveform_*` 已是 2–8 Hz 缓存，**不得再滤一遍**（双重带通扭曲 SNR），只可画图或 `band=()` 直接取窗。完整参数、两个坑（整段滤波、噪声窗避开 P 波）、下游接法 → seismic-twave-analysis `references/snr-unified-noise-baseline.md`。
+## SNR 口径（2026-10-14 起，取代 2026-09-02 的“未带通 + Welch 频段积分”）
+
+统一噪声基准 SNR = 20log10( 信号窗 RMS / **阵列噪声中位数** )；波形**先 2–8 Hz 整段带通、再切窗算 RMS**。`stations.csv` 主列 `snr_u` 即此口径（`snr/snr_z/snr_r` 是自噪对照列）。`sacprocess/envelope/*.npz` 的 `waveform_*` 已是 2–8 Hz 缓存，**不得再滤一遍**（双重带通扭曲 SNR），只可画图或 `band=()` 直接取窗。完整参数、两个坑（整段滤波、噪声窗避开 P 波）、下游接法 → seismic-twave-analysis `references/snr-unified-noise-baseline.md`。
+
+## 表达约定（问原理时）
 
 **偏振原理说明的表达**：用户只问原理时，连续、直接地回答；**默认给 3–6 行要点版**（用户嫌长会直说"太复杂了"），只在其要求时才展开成多段；除非明确要求，不贴代码，也不要拆成很多细小段落或清单。必须明确区分“无向偏振轴”和“有向 BAZ”。
 

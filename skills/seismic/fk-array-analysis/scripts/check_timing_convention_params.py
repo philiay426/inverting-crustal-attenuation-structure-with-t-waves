@@ -65,8 +65,8 @@ def grid_report(name, T, band, dt, smax=None, spts=None):
           + (f'   脚本用 SMAX={smax} / SPTS={spts}' if smax else ''))
     if smax:
         ok_ali = smax * f_hi <= A_LIMIT_DEFAULT
-        print(f'{"":16} 无混叠复核 f_hi·SMAX = {smax*f_hi:.4f} <= {A_LIMIT_DEFAULT} ? '
-              f'{"PASS" if ok_ali else "FAIL（混叠：把 SMAX 收到 " + format(A_LIMIT_DEFAULT/f_hi, \".2f\") + " 或切带顶）"}')
+        _msg = "PASS" if ok_ali else "FAIL（混叠：把 SMAX 收到 %.2f 或切带顶）" % (A_LIMIT_DEFAULT / f_hi)
+        print(f'{"":16} 无混叠复核 f_hi·SMAX = {smax*f_hi:.4f} <= {A_LIMIT_DEFAULT} ? {_msg}')
         if spts:
             ds = 2.0 * smax / (spts - 1)
             print(f'{"":16} 步长 Δs = 2·SMAX/(SPTS−1) = {ds:.4f} s/deg；'
