@@ -82,3 +82,17 @@ codex/
 | V_ocean | 1.48 km/s | SOFAR声速 |
 | V_land | 3.6 km/s | Love波速 |
 | SNR方法 | Welch PSD 2-8Hz | 频域功率谱, 非包络峰值 |
+
+## Hermes skills（T 波衰减分析工作流）
+
+`skills/seismic/` 下是可直接装入 Hermes Agent 的 skill（`~/.hermes/skills/seismic/`）：
+
+| skill | 作用 |
+|---|---|
+| `twave-crustal-attenuation` | **编排**：五步顺序、步间契约、Q(f) 反演（步 4） |
+| `seismic-twave-analysis` | 步 0 预处理 + 步 1 台站表/走时/剖面 |
+| `single-station-analysis` | 步 2 单台偏振与四类证据 |
+| `fk-array-analysis` | 步 3 子阵 F-K（几何→引擎→慢度图） |
+| `plotting-standards` | 制图定版基线（栏宽/字号/线宽/图例/命名） |
+
+全流程按五步走；只做其中一段时单独加载对应模块。详见 `skills/README.md`。
