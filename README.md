@@ -96,3 +96,22 @@ codex/
 | `plotting-standards` | 制图定版基线（栏宽/字号/线宽/图例/命名） |
 
 全流程按五步走；只做其中一段时单独加载对应模块。详见 `skills/README.md`。
+
+## 运行环境（WSL / Linux 优于 Windows 盘）
+
+流程是"几千个小文件"型 I/O，实测同一批 SAC：`/mnt/e`（9p）30.2 ms/个、ext4 1.7 ms/个（约 20 倍）。
+所以：
+
+| 内容 | 放哪 |
+|---|---|
+| 代码 / 仓库 / skill | Linux 本地盘（`~/codex`、`~/.hermes/skills/`） |
+| 原始数据、成品图 | 共享盘 `/mnt/e/sharedate`（容量大，顺序读够用） |
+| 桌面上的 skill 包 | 只作分享镜像，**不要在里面跑脚本** |
+
+两个辅助脚本：
+
+```bash
+scripts/stage_event.sh <事件目录名> [子目录...]        # 数据缓存到 ~/data_cache/<事件>/（默认 raw）
+scripts/stage_event.sh --back <事件目录名> <子目录>    # 本地产出回写共享盘
+scripts/sync_skills.sh "提交信息"                      # ~/.hermes/skills/seismic -> 仓库 -> 双推
+```
