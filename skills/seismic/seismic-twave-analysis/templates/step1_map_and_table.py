@@ -47,9 +47,12 @@ MAP_DIR = Path(_os.environ.get("T_MAPDIR", _DEMO))                # 分布图也
 # 事件信息（★ 每个事件填一次；也可用 EVENT_* 环境变量覆盖）
 EVENT_DATE = _os.environ.get("EVENT_DATE", "YYYY-MM-DD")
 EVENT_MW = float(_os.environ.get("EVENT_MW", "0.0"))
-EVLA = float(_os.environ.get("EVENT_LAT", "0.0"))
-EVLO = float(_os.environ.get("EVENT_LON", "0.0"))
-EVDP = float(_os.environ.get("EVENT_DEP", "10.0"))
+_elat, _elon = _os.environ.get("EVENT_LAT"), _os.environ.get("EVENT_LON")
+if not (_elat and _elon):
+    raise SystemExit("必须给 EVENT_LAT / EVENT_LON：震中坐标决定震中距、到时与 SNR 窗，"
+                     "用 (0,0) 兜底会算出 SNR=0 的废表（实测 39 台全部 SNR<6 dB）")
+EVLA, EVLO = float(_elat), float(_elon)
+EVDP = float(_os.environ.get("EVENT_DEP") or _os.environ.get("EVENT_DEPTH") or "10.0")
 
 # 走时与SNR
 V_OCEAN = 1.48   # SOFAR km/s
