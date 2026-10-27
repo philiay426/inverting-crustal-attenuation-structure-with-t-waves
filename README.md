@@ -1,16 +1,15 @@
 # T波地震数据处理工具包
 
-## 3 步事件处理流程（批量统计）
+## 2 步事件处理流程（批量统计）
 
 ```
-加新事件: 编辑 config/events.yaml → 按顺序跑 3 个脚本
+加新事件: 编辑 config/events.yaml → 按顺序跑 2 个脚本
 ```
 
 | 步骤 | 脚本 | 功能 | 输出 |
 |:----|:-----|:-----|:-----|
 | 1 | `step1_station_table_and_map.py` | 台站信息+到时+SNR+台站分布图 | stations.xlsx, stations.csv, figure_map_tp.png |
 | 2 | `profile_wide.py` | 波形剖面图(全局P98+软裁剪+海洋对齐) | profile_az*.png |
-| 3 | `find_conversion_point.py` | 转换点计算+走时残差验证 | conversion_points.csv, residuals.csv |
 
 ### 用法
 
@@ -26,8 +25,7 @@ python3 scripts/step1_station_table_and_map.py mindanao_2026 --snr-min 5.0
 python3 scripts/profile_wide.py puerto_rico --snr-min 3 --y-land --align-tp
 python3 scripts/profile_wide.py puerto_rico --snr-min 3 --y-land --align-tp --exclude X51A,X60A
 
-# 步骤3: 转换点计算与走时残差
-python3 scripts/find_conversion_point.py puerto_rico
+# 转换点计算（基于 BAZ + 走时残差）已于 2026-09-28 取消，脚本删除；海陆分段仍由步骤 1 的 land_km 给出
 ```
 
 ### 添加新事件
@@ -50,7 +48,7 @@ new_event:
   v_love: 3.6      # 可选, 默认3.6
 ```
 
-然后把原始 SAC + SACPZ 放到 `data_dir`，跑预处理(`lib/processing.py`)后开始 3 步流程。
+然后把原始 SAC + SACPZ 放到 `data_dir`，跑预处理(`lib/processing.py`)后开始 2 步流程。
 
 ## 目录结构
 
@@ -62,10 +60,9 @@ codex/
 │   ├── processing.py           → 去响应、滤波、SACPZ
 │   ├── arrivals.py             → 到时计算+SNR(Welch PSD)
 │   └── rotation.py             → ZNE→ZRT、能量比
-├── scripts/                    ← 3 步主脚本 (通用, 参数化)
+├── scripts/                    ← 主脚本 (通用, 参数化) + stage_event.sh / sync_skills.sh
 │   ├── step1_station_table_and_map.py
-│   ├── profile_wide.py
-│   └── find_conversion_point.py
+│   └── profile_wide.py
 ├── scripts/old_scripts/        ← 旧版脚本备份
 ├── t_phase_analysis/           → T波走时+PMCC+时频谱
 └── case/                       → 各事件工作目录
