@@ -221,7 +221,7 @@ from processing import remove_response, apply_bandpass, parse_sacpz
 | `process_single_station.py` | 3. 单台分析 | `--plot` 出 bandpass+spectrogram 并排图 |
 | `waveform_proflie.py` | 剖面 | 独立波形剖面：land_km 分箱(10km)取SNR最高、分区域、0.5-2Hz低频、包络独立P98（见下「波形剖面」节） |
 
-> ⚠️ `profile_conversion.py` 已废弃 — 剖面图功能已并入 `step1_station_table_and_map.py`（`_gen_waveform_profile()` 函数）。步1一键输出5件套。
+> ⚠️ 旧的 `profile_conversion.py` 已删除（2026-10）。本流程剖面图用 `templates/waveform_proflie.py`（land_km 分箱）或 `templates/step1_record_sections_3x2.py`（3x2 多面板）。
 
 
 ### ⚠️ Python 环境

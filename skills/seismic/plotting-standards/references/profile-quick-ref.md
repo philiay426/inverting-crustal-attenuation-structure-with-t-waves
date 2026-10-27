@@ -6,7 +6,7 @@
 |------|------|------|
 | **独立脚本（推荐）** | `templates/waveform_proflie.py` | 新事件标准，land_km 分箱取 SNR 最高 |
 
-> ⚠️ `profile_conversion.py` 已废弃。step1 内置 `_gen_waveform_profile()` 仅作备份。
+> ⚠️ 旧的 `profile_conversion.py` 已删除（2026-10）；新事件用 `templates/waveform_proflie.py` 或 `step1_record_sections_3x2.py`。
 
 ## 参数速查
 
