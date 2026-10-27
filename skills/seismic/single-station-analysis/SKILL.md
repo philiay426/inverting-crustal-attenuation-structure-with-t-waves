@@ -60,52 +60,16 @@ python ~/.hermes/skills/seismic/single-station-analysis/scripts/run_single_stati
 - 自动 copy 预处理图 + 跑 5 个模板脚本 + 重命名/清理
 - 输出到 `process_flow/2_single_station_analysis/{STA}/`
 
-## 转换点反方位角与到时联合约束（🔴 2026-09-28 已取消：不成熟）
+## 偏振反演观测 BAZ（只用于验证 F-K 来向）
 
-> 🔴 **取消范围**：把「BAZ–海岸线交点的候选射线」定为**最终转换点**这一步（原 `process_flow/3_conversion_point/` 那套分析）**不再执行、不进流程、不再建目录**；不主动发起转换点定位/验证任务，用户点名才启用。
-> **不受影响**：T 波物理上的「海陆转换点 / −1000 m 等深线交点」概念仍到处在用（陆地计时 `t − ocean/1.48`、`T-P_local/T-S_local` 几何、F-K 陆地计时模型）；**独立 BAZ 轴反演**仍是步2/步3 的手段（`references/independent-baz-energy-window-workflow.md`、`polarization-baz-conversion-map.md` 的方法部分照旧可查）。
-> 下面的内容作为方法记录保留（随时可重启），**不要主动执行**。
-
-在接收端转换点分析中，**BAZ 与海岸线/等深线的几何交点不能直接称为转换点**。必须把方向和走时同时作为约束：
-
-1. 在理论 T-P 邻域用噪声统计阈值识别**初动**，不能用最大包络峰代替初动；
-2. 独立 BAZ 轴反演须在原始地理坐标 **Z/N/E 三分量**的初动短窗做 PCA；最大三维主轴的 N/E 水平投影给出北起顺时针的无向水平偏振轴。Z 分量用于共同约束主轴倾角、线性度和波型，不应简单弃用；不要先用理论 BAZ 旋转到 R/T 后再声称独立反演。理论 BAZ 仅用于事后残差比较；
-3. PCA 主轴的正负号等价，必须保留 `axis_az` 与 `(axis_az+180) % 360` 两个候选有向 BAZ。结合初动极性、走时/海陆几何联合约束和偏振稳定性筛选有向传播方向；不能仅因某分支更接近理论 BAZ 而选择它；
-4. 每个 BAZ–海岸线（或海陆边界）交点都必须计算联合走时：
-   \[
-   t_{TP}=d_{ocean}/v_{ocean}+d_{land}/v_{land}
-   \]
-   并与观测 T-P 初动时间比较；
-5. 只有方向约束和走时残差同时合格时，才能写入 `final_conv_lon/final_conv_lat`。否则只记录为候选交点，`selected_ray=0`，禁止强行选点。
-
-CSV 至少保留每条候选射线的海洋距离、陆地距离、预测到时、到时残差和是否通过时间约束；图中应区分“几何候选转换点”和“满足到时约束的最终转换点”。具体字段和检查例程见 `references/conversion-point-joint-constraint.md`。
-
-### 从前 N 站扩展到全台站（已验证流程）
-当用户要求把搜索方案扩展到全台站时：
-1. 在原有 `run_polarization_guided_picks.py` 上将台站选择从 `[:TOP_N]` 改为按 SNR 排序的完整 `stations.csv`，不要把低 SNR 台站静默删除；
-2. 每站保留 `accepted_tp/accepted_ts/accepted/reject_reason`，通过站与未通过站必须在 CSV 中区分；未通过站可以作为候选方向/候选转换点绘制，但不能当作最终物理证据；
-3. 在原有转换点绘图脚本上改输出文件名（如 `all_conversion_topography.png`、`all_observed_conversion_points.csv`），保留旧的 top-N 结果；
-4. 图上应保留全部台站标记，即使某条射线未找到 `-1000 m` 交点；交点缺失应写空值并在终端汇报，不得因 `continue` 使台站从全台站图中消失；
-5. 运行前备份旧拾取 CSV 和 summary；运行后核对：拾取行数=stations.csv 实际行数、转换点 CSV 覆盖全部拾取台站、PNG 确实生成，并汇报 accepted 数量与交点数量。
-
-**全台站候选图的筛选口径（2026-08-25）**：当目标是考察全台站的方向/转换点空间分布时，SNR 是辅助质量字段，**不是删站核心条件**；全部可计算台站都应保留在候选图和 CSV 中。`accepted` 只能表述为“满足当前偏振、窗口质量和到时顺序的初筛条件”，不能表述为“仅这些台站可用”。图例和结果必须严格区分“几何候选转换点”与“满足初动—方向—联合走时约束的最终转换点”。
-
-**偏振原理说明的表达**：用户只问原理时，连续、直接地回答；**默认给 3–6 行要点版**（用户嫌长会直说"太复杂了"），只在其要求时才展开成多段；除非明确要求，不贴代码，也不要拆成很多细小段落或清单。必须明确区分“无向偏振轴”和“有向 BAZ”。
+`obs_baz = (baz + tp_rt_angle) % 360`（`pca()` 的 ZRT `principal_vector` 里 `a = atan2(T,R)`，径向偏振轴沿传播方向）。
+只取震源侧分支，不画 +180 分支；轴向角差用 `%180` 不用 `%360`。
+它只作**事后诊断**（与 F-K 的 BAZ 比残差、看是否同号同量级），不用它反过来挑时窗或挑台。
+完全不以理论 BAZ 参与挑窗的独立流程见 `references/independent-baz-energy-window-workflow.md`。
 
 **SNR 口径（2026-10-14 起，取代 2026-09-02 的“未带通 + Welch 频段积分”）**：统一噪声基准 SNR = 20log10( 信号窗 RMS / **阵列噪声中位数** )；波形**先 2–8 Hz 整段带通、再切窗算 RMS**。`stations.csv` 主列 `snr_u` 即此口径（`snr/snr_z/snr_r` 是自噪对照列）。`sacprocess/envelope/*.npz` 的 `waveform_*` 已是 2–8 Hz 缓存，**不得再滤一遍**（双重带通扭曲 SNR），只可画图或 `band=()` 直接取窗。完整参数、两个坑（整段滤波、噪声窗避开 P 波）、下游接法 → seismic-twave-analysis `references/snr-unified-noise-baseline.md`。
 
-详细字段和联合约束原则见 `references/conversion-point-joint-constraint.md` 与 `references/polarization-baz-conversion-map.md`。
-
-**从拾取 R-T 角反演观测 BAZ 并延长到海岸线画转换点**（用户要求：只延长靠近震源一侧、前十站都做、不覆盖原图）：
-`obs_baz = (baz + tp_rt_angle) % 360`（pca() 的 ZRT `principal_vector` 中 `a=atan2(T,R)`，
-径向波偏振轴沿传播方向）；玫瑰图 + grdtrack 采样 -1000 m 等深线求交点、本地缓存瓦片拼网格等
-完整配方见 `references/polarization-baz-conversion-map.md`。若需要完全不以理论 BAZ 参与挑窗的独立流程（ZNE 能量初动窗→原始 N/E PCA 轴→双分支走时约束→R/T 仅事后诊断），见 `references/independent-baz-energy-window-workflow.md`。
-
-**常见错误：**
-- 只求 BAZ 与海岸线交点，不检查到时；
-- 把理论转换点方向用于选择观测 BAZ 的 180° 分支；
-- 把 `h1 or h2` 之类的第一个几何交点当作最终结果；
-- 用传播方向和偏振轴方向混淆的角度定义比较结果。
+**偏振原理说明的表达**：用户只问原理时，连续、直接地回答；**默认给 3–6 行要点版**（用户嫌长会直说"太复杂了"），只在其要求时才展开成多段；除非明确要求，不贴代码，也不要拆成很多细小段落或清单。必须明确区分“无向偏振轴”和“有向 BAZ”。
 
 ## ⚠️ 时间轴铁律（2026-08-04，必须遵守）
 

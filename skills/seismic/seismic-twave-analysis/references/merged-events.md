@@ -479,11 +479,7 @@ ax.plot(tt, y0+na, 'o')
 
 #### 脚本
 
-标准脚本：`profile_conversion.py`（位于每个事件的 `process_flow/2_waveform_profile/`）
-
-```bash
-~/envs/tphase_env/bin/python3 profile_conversion.py <event_key> --snr-min 3.0
-```
+剖面图已并入 `step1_record_sections_3x2.py`（旧的 `profile_conversion.py` 已删除，不要再调）。
 
 #### 关键实现
 

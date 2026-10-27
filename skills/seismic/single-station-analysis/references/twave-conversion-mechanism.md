@@ -14,7 +14,7 @@
 | PR2014（波多黎各） | ✓ P/SV | ✓ Love 波 | 大陆坡缓 → 发生 Love 转换 |
 | 南非（Prince Edward） | ✓ P/SV | ✗ **无 Love** | 大陆坡陡 → 仅 P/SV |
 
-- 与 De Groot-Hedlin (2020) 一致。文献摘录（含 AELUMA、Love 波识别方法、西海岸 Hawaii 2006 对照、De Groot-Hedlin & Orcutt 2001）→ `twave-conversion-merged-notes.md`。
+- 与 De Groot-Hedlin (2020) 一致。文献：AELUMA 台阵、Love 波识别、Hawaii 2006 对照、De Groot-Hedlin & Orcutt (2001)。
 - 南非 Mw6.7 (2019-01-22) 实测：33 站 AZ 302.6–329.6°（连续单一群），仅 T-P 无 T-S → `south-africa-mw67-2019-polarization.md`。
 - ⇒ 南非这类事件的 T 波**只需确认径向（R-T ≈ 0°）**，不必区分两种波型。
 

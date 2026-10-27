@@ -110,177 +110,14 @@ Before attempting automated picking:
 2. If median SNR < 1.2 → **warn user**: automated picking will produce unreliable results
 3. Visual check: plot waveform + envelope for 3-4 representative stations with theoretical arrival overlaid
 
-# 转换点对参考深度的敏感性
+# 海陆分段（−1000 m 等深线交点）
 
-## 发现
+T 波在 SOFAR 声道以 1.48 km/s 传播，到 −1000 m 等深线（陆坡）转为陆壳 Love 波（3.6 km/s）。
+沿震中→台站大圆找该交点，得到 `ocean_km` / `land_km` 与 `T-P_local` / `T-S_local` 的锚点；
+实现见 `step1_map_and_table.py`（大圆 + ETOPO，2 km 步长插值）。
 
-±500m 深度扰动（-500m / -1000m / -1500m）下转换点水平位移:
-
-| 群 | 坡度特征 | 水平位移 | 
-|:---|:---|:---|
-| 350°（新英格兰） | 陡坡 | ~20 km |
-| 327°（巴哈马台地） | 极缓坡 | ~8× 更大，部分站 >100 km |
-
-## 原因
-
-350° 群转换区位于新英格兰大陆坡，坡度 ~3-5°，500m 深度变化对应 ~10 km 水平距离。327° 群转换区经过巴哈马浅滩，坡度 <1°，相同深度变化对应远超 100 km 水平距离，部分站 -1000m 等深线根本不在大陆坡上。
-
-## 结论
-
-几何转换点法适用于陡坡海岸（350° 群已验证）。327° 群 SNR 本身极低（均值 0.5 dB），无法进行有效的走时验证，且深度敏感性过大。论文中建议：350° 群使用几何法，327° 群标注为参考值，不作为方法验证对象。
-
-## 生成图
-
-`conversion_depth_sensitivity.png` - 黑点=-1000m基准，灰点=±500m范围，灰色虚线连接每站三个深度点。
-
-# 转换点定位 — 几何法 (大圆 + ETOPO -1000m 等深线)
-
-## 原理
-
-T 波转换点 = 震源→台站大圆路径与 -1000m 等深线的唯一交点。无自由参数。
-
-```
-震源 ──(SOFAR, 1.48 km/s)──→ C (转换点) ──(Love, 3.6 km/s)──→ 台站
-         海洋段                          陆地段
-```
-
-C 由两个约束确定：(1) 在大圆上；(2) 在 -1000m 等深线处。
-
-## 算法
-
-```python
-for d_km in 2km步长沿大圆:
-    el = ETOPO(pt.lat, pt.lon)
-    if 上一个点 > -1000m and 当前点 <= -1000m:  # 跨过了
-        C = 插值 → 转换点
-```
-
-## 与网格搜索的区别
-
-| | 网格搜索 | 几何法 |
-|:---|:---|:---|
-| 自由参数 | 2 (lat, lon) | 0 |
-| 约束 | 无 | 大圆+等深线 |
-| 问题 | 可偏离大圆(PR2014跑到341°而非350°) | 无 |
-
-网格搜索失败原因：无约束时 RMS 最小化会选择偏离大圆的海岸点（方位角偏移 ~9°）。
-
-## 双剖面交叉验证
-
-- 327° 群：转换点 29.1-36.4°N (佛罗里达→北卡)
-- 350° 群：转换点 37.2-40.2°N (弗吉尼亚→新泽西)
-- 两群自然分离，物理方向正确 → 方法自洽
-
-## 参考深度敏感性
-
-对 K62A 测试：-2000m 到 -100m 变化 (1900m 跨度)，转换点水平位移仅 ~45 km，走时变化 ~18s。方法对参考深度不敏感。
-
-## 相关文件
-
-- `t_phase_analysis/traveltime_profile.py` — tt_t() 使用相同原理
-- `4_conversion_point/find_conversion_point.py` — 几何法实现
-- `4_conversion_point/all_station_conversion_points.csv` — 343站结果
-
-# 转换点定位 — 走时残差网格搜索 (已废弃)
-
-## 教训
-
-网格搜索法已被废弃，改用几何法 (`references/conversion-point-geometric-method.md`)。
-
-## 失败原因
-
-1. **无约束的 2D 搜索允许候选点偏离大圆** — PR2014 350°群选了方位角 341°的点（偏差 988km）
-2. **±1°大圆容差不够** — 350°大圆在深海通过，美国大陆坡在其西侧 300-800km
-3. **41站混合求平均无物理意义** — 每站有不同的转换点，不该共享一个平均值
-
-## 物理教训
-
-水声波沿大圆传播，转换点必须在大圆上。RMS 最小化不应以牺牲这一物理约束为代价。
-
-# T 波海岸转换点定位方法
-
-## 方法演化
-
-### 1. 网格搜索 (❌ 已废弃)
-- 在海岸 -1000m 等深线上自由搜索最优转换点
-- 最小化 RMS(T_obs - T_pred)
-- **问题**: 无方位角约束, 搜索可能偏离大圆路径
-- PR2014 案例: 搜索到 31°N/-79.9°W, 但实际方位角 318°, 不在 350° 大圆上
-
-### 2. 大圆约束搜索 (⚠ 部分有效)
-- 沿 350° 大圆 ±N° 横向容差搜索
-- **问题**: 大陆坡可能远离大圆 (PR2014 350°大圆在深海通过, 距美国东海岸 300-800 km)
-- 需要很宽的容差 (±3°) 才够到大陆坡
-
-### 3. 几何交点法 (✅ 推荐)
-- **原理**: 对每个台站, 沿震源→台站大圆逐点采样 ETOPO 水深, 找 -1000m 交叉点
-- **零自由参数**: 转换点完全由几何确定
-- **与 tt_t() 等价**: tt_t() 内部也是同样的大圆+ETOPO+-1000m 逻辑
-- **验证**: K62A 的几何法 T-P = 1630s vs tt_t() T-P = 1631.8s (差 1.7s, 仅采样精度差异)
-
-## 算法实现
-
-```python
-from geographiclib.geodesic import Geodesic
-import pygmt, numpy as np
-
-def find_conversion_point(stlo, stla, evlo, evla, grid):
-    """找大圆路径与 -1000m 等深线的交点"""
-    geod = Geodesic.WGS84
-    g = geod.Inverse(evla, evlo, stla, stlo)
-    azi = g['azi1']
-    total_km = g['s12'] / 1000.0
-    
-    lat_a = grid.lat.values; lon_a = grid.lon.values; el = grid.values
-    prev_el = prev_lat = prev_lon = prev_d = None
-    
-    for d_km in np.arange(10, total_km, 2):  # 2km 步长
-        pt = geod.Direct(evla, evlo, azi, d_km * 1000)
-        i_lat = np.argmin(np.abs(lat_a - pt['lat2']))
-        i_lon = np.argmin(np.abs(lon_a - pt['lon2']))
-        el_v = float(el[i_lat, i_lon])
-        
-        if prev_el is not None:
-            if (prev_el > -1000 and el_v <= -1000) or (prev_el <= -1000 and el_v > -1000):
-                c_lat = (pt['lat2'] + prev_lat) / 2
-                c_lon = (pt['lon2'] + prev_lon) / 2
-                ocean_km = (d_km + prev_d) / 2
-                land_km = total_km - ocean_km
-                return c_lon, c_lat, ocean_km, land_km
-        prev_el, prev_lat, prev_lon, prev_d = el_v, pt['lat2'], pt['lon2'], d_km
-    return None
-```
-
-## 参考深度敏感性
-
-对 K62A 测试不同参考深度 (-2000m 到 -100m):
-
-| 深度 (m) | 转换点纬度 | 水平位移 | 总走时 (s) |
-|:---|:---|:---|:---|
-| -2000 | 39.61°N | — | 1665 |
-| -1000 | 39.79°N | +18 km | 1673 |
-| -100  | 40.01°N | +27 km | 1683 |
-
-**结论**: 深度从 -2000m 到 -100m (跨度 1900m), 转换点水平位移仅 ~45 km, 总走时变化仅 18s。大陆坡足够陡, 参考深度选择不敏感。
-
-## PR2014 验证结果
-
-- **327° 群** (az 314-340°): 23 站, 转换点 29.1-36.4°N (佛罗里达→北卡)
-- **350° 群** (az 341-360°): 45 站, 转换点 37.2-40.2°N (弗吉尼亚→新泽西)
-- **其他方位**: 0 站 — 所有 SNR≥8 台站都属于这两个群
-- **核心 350° 群** (az 348-353°): 20 站转换点集中度极高 (39.2-39.9°N, 仅 0.7° 分散)
-- **Love 波走时验证**: 41 站 T 分量包络峰值 vs 几何法预测 (v_land=3.6 km/s), 均值偏差 4.6s
-
-## F-K 分析的局限
-
-- **台站间距**: TA 网 ~50-70 km, T 波波长 ~0.9 km (4 Hz, v=3.6) → 严重空间混叠
-- **AELUMA 方法**: DGH(2020) 用数百个重叠三元组统计综合, 测的是沿阵速度而不是反方位角
-- **DGH 的成功**: 用大量子阵综合确认了 Love 波速度 (3.4-3.9 km/s), 验证了波型
-- **结论**: TA 台间距对反方位角 F-K 不适用; 几何交点法是合理的替代方案
-
-## 参考文献
-- De Groot-Hedlin (2020), SRL 91(6), 3444-3453
-- De Groot-Hedlin & Hedlin (2015), BSSA, AELUMA 算法
+> 转换点定位（把该交点当“最终转换点”反演）已于 2026-09-28 取消，方法与脚本已删除；
+> 下面直接接其它主题。
 
 # Custom Arrivals: Empirical Velocity Model for Island-Arc Paths
 
@@ -457,7 +294,7 @@ all genuine T-waves (for comparison: S-wave celerity ≈ 4.5 km/s, P-wave ≈ 7.
 
 # De Groot-Hedlin (2020) — Seismic T-Wave Observations
 
-Full summary in `single-station-analysis/references/twave-conversion-merged-notes.md`（De Groot-Hedlin 2001/2020 摘录与 Love 波识别方法；原 `twave-conversion-mechanism` skill 已于 2026-09-15 归档并入）。
+摘要见 `single-station-analysis/references/twave-conversion-mechanism.md`（De Groot-Hedlin 2001/2020；原 `twave-conversion-mechanism` skill 已于 2026-09-15 并入）。
 
 Key takeaway for PR2014: Seismic T-waves on US East Coast **propagate as Love waves** (velocity 3.4-3.9 km/s, transverse polarization). This is the **receiver-side** conversion (hydroacoustic → seismic at coast), NOT the source-side generation mechanism.
 
@@ -1366,9 +1203,8 @@ Hudson Canyon 破坏 M62A 转换点 Love 波发育:
 
 ## 实现
 
-脚本: `find_conversion_point.py` (大圆+ETOPO)
-输出: `all_station_conversion_points.csv` (每站独立转换点)
-可视化: `all_conversion_points_map.png` (两群菱形标注)
+（转换点定位这一步已于 2026-09-28 取消：几何交点不能单独当转换点，相关脚本与文档已删除。
+本节只保留几何法与速度测量作为背景。）
 
 # get_track() and tt_t() Pitfalls (July 2026)
 
