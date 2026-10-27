@@ -23,8 +23,10 @@ from matplotlib.lines import Line2D
 
 # ============================ ★ 参数区 ============================
 HERE = os.path.dirname(os.path.abspath(__file__))
-BASE = os.environ.get('Q_BASE') or os.path.abspath(
-    os.path.join(HERE, '..', '..', '..'))      # process_flow/（可用 Q_BASE 覆盖）
+_b = os.environ.get('Q_BASE')
+if not _b:
+    raise SystemExit('请用环境变量 Q_BASE 指定事件的 process_flow 目录（其下有 1_station_distribution/stations.csv）')
+BASE = os.path.abspath(_b)
 CSV_PATH = os.path.join(BASE, '1_station_distribution', 'stations.csv')
 # 包络目录：默认 BASE/0_data_processing/envelope；新布局/旧布局不同时用 Q_ENV_DIR 指过去
 ENV_DIR = os.environ.get('Q_ENV_DIR') or os.path.join(BASE, '0_data_processing', 'envelope')

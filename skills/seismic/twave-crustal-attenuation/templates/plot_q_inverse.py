@@ -43,7 +43,10 @@ plt.rcParams.update({
 
 # ============================== ★ 参数区
 HERE   = os.path.dirname(os.path.abspath(__file__))
-DET    = os.environ.get('Q_DETAIL') or os.path.join(HERE, 'q_s13_detail.csv')
+CSV_IN = os.environ.get('Q_CSV', '')
+DET    = os.environ.get('Q_DETAIL') or (CSV_IN.replace('_byfreq', '_detail') if '_byfreq' in CSV_IN else '')
+if not DET or not os.path.exists(DET):
+    raise SystemExit("缺逐台明细 CSV：设 Q_DETAIL（一般与 Q_CSV 同名，只是 _byfreq -> _detail）")
 OUTPNG = os.environ.get('Q_OUTPNG') or os.path.join(HERE, os.pardir, 'Q倒数_拟合线.png')
 CODA   = os.environ.get('Q_CODA', '2S')      # ★ 尾波口径（列名后缀 A_coda_<CODA>）
 CODA_OF_STA = {}                             # 逐台例外口径（只在有判据时用）

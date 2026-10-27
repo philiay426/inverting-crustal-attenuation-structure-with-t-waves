@@ -35,8 +35,8 @@ if not SRC:
     raise SystemExit("请用环境变量 T_BASE 指定事件根目录")
 STACSV = (os.environ.get("T_CSV")
           or os.path.join(SRC, "process_flow", "1_station_distribution", "stations.csv"))
-EV = (float(os.environ.get("EVENT_LAT", "0.0")),
-      float(os.environ.get("EVENT_LON", "0.0")))           # 震中（lat, lon）
+_evlat, _evlon = os.environ.get("EVENT_LAT"), os.environ.get("EVENT_LON")
+EV = (float(_evlat), float(_evlon)) if (_evlat and _evlon) else None   # 震中（lat, lon）；缺则不算理论 BAZ
 # 子阵台站名单由 FK_STAS 传入（逗号分隔）；FK_TAG 只决定输入/输出文件名前缀
 SUB = os.environ.get("FK_TAG", "G1")
 STAS = [x.strip() for x in os.environ.get("FK_STAS", "").split(",") if x.strip()]
@@ -126,7 +126,8 @@ def main():
     # 孔径：台站两两最大距离
     D = dmat.max()
     floor = 1.28 * dmin / D
-    baz_mean = np.mean([gps2dist_azimuth(EV[0], EV[1], a, b)[2] for a, b in zip(lat, lon)])
+    baz_mean = (np.mean([gps2dist_azimuth(EV[0], EV[1], a, b)[2] for a, b in zip(lat, lon)])
+                if EV else float("nan"))
     print(f"\n几何: d_min = {dmin:.0f} km, 孔径 D = {D:.0f} km")
     C = 111.195 / (2 * dmin)                       # 抗混叠常数 s/deg·Hz
     f_noalias = C / SMAX_                          # 带内上界必须 <= 该值
@@ -136,7 +137,10 @@ def main():
     print(f"预测慢度 u_pred = 111.195/V_T = {SMAX_/1.4:.2f} s/deg（smax = 1.4*u_pred）")
     print(f"分辨率地板 Δs/u >= 1.28*d_min/D = {floor*100:.0f}%   （4 台比 7-9 台更差，峰更宽）")
     print(f"BAZ 误差 ~ Δu/|u| = {floor*100:.0f}% -> ±{floor*360/ (2*np.pi)*0 if False else floor*57.3:.0f} deg 量级（不能报小数）")
-    print(f"理论 BAZ（{len(STAS)} 台均值，gps2dist_azimuth）= {baz_mean:.1f} deg")
+    if EV:
+        print(f"理论 BAZ（{len(STAS)} 台均值，震中 -> 台站反方位角）= {baz_mean:.1f} deg")
+    else:
+        print("未给 EVENT_LAT/EVENT_LON：跳过理论 BAZ（不要用 (0,0) 兜底，方位会完全错）")
 
     with open(os.path.join(OUT, f"fk_peaks_{SUB}.csv"), "w", newline="") as f:
         w = csv.writer(f)
@@ -158,12 +162,13 @@ def main():
         ax.plot(xs[j], ys[i], "o", ms=4, mfc="none", mec="k", mew=0.8)
         ax.annotate(f"{u:.1f} s/deg, {baz:.0f} deg", (xs[j], ys[i]), textcoords="offset points",
                     xytext=(5, -10), fontsize=7)
-    # 理论 BAZ 方向射线
-    for uu in (10, 20, 30):
+    # 理论 BAZ 方向射线（无事件坐标时不画）
+    for uu in ((10, 20, 30) if EV else ()):
         ax.plot([0, uu * np.sin(np.radians(baz_mean))], [0, uu * np.cos(np.radians(baz_mean))],
                 color="0.35", lw=0.7, ls="--")
-    ax.text(0.2 * np.sin(np.radians(baz_mean)), 28, f"theory BAZ {baz_mean:.0f} deg",
-            fontsize=7, color="0.3", rotation=-15)
+    if EV:
+        ax.text(0.2 * np.sin(np.radians(baz_mean)), 28, f"theory BAZ {baz_mean:.0f} deg",
+                fontsize=7, color="0.3", rotation=-15)
     ax.set_xlim(-SMAX_, SMAX_)
     ax.set_ylim(-SMAX_, SMAX_)
     ax.set_aspect("equal")
